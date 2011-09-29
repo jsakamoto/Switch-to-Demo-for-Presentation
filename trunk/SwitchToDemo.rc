@@ -94,5 +94,33 @@ END
 //
 //
 
+VS_VERSION_INFO    VERSIONINFO 
+FILEVERSION        1,1,0,0
+PRODUCTVERSION     1,1,0,0
+FILEFLAGSMASK      VS_FFI_FILEFLAGSMASK 
+FILEFLAGS          0x00000000L
+FILEOS             VOS__WINDOWS32
+FILETYPE           VFT_APP
+FILESUBTYPE        VFT2_UNKNOWN
+BEGIN
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x0409, 1252
+    END
+
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "CompanyName",      ""
+            VALUE "FileDescription",  "Switch to Demo for Presentation"
+            VALUE "FileVersion",      "1.1.0\0"
+            VALUE "OriginalFilename", "SwitchToDemo.exe\0"
+            VALUE "ProductName",      "Switch to Demo for Presentation\0"
+            VALUE "ProductVersion",   "1.1.0\0"
+        END 
+    END
+END
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

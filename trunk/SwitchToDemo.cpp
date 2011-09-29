@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <math.h>
 #include "SwitchToDemo.h"
 
 #define MAX_LOADSTRING 100
@@ -9,6 +10,7 @@ HINSTANCE hInst;
 TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
 UINT WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
+HWND hMainWnd;
 
 // Function prototypes.
 ATOM				MyRegisterClass(HINSTANCE hInstance);
@@ -19,6 +21,7 @@ void OnHotKey(HWND);
 void OnTaskTrayMessage(HWND hWnd, LPARAM lParam);
 HWND FindApplicationWindow();
 HWND FindSlideShowWindow();
+void FadeMainWnd(BOOL bFadeIn);
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -65,8 +68,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	wcex.hInstance		= hInstance;
 	wcex.hIcon			= LoadIcon(hInstance, MAKEINTRESOURCE(IDI_SWITCHTODEMO));
 	wcex.hCursor		= LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW+1);
-	wcex.lpszMenuName	= MAKEINTRESOURCE(IDC_SWITCHTODEMO);
+	wcex.hbrBackground	= (HBRUSH)GetStockObject(BLACK_BRUSH);
+	wcex.lpszMenuName	= NULL;//MAKEINTRESOURCE(IDC_SWITCHTODEMO);
 	wcex.lpszClassName	= szWindowClass;
 	wcex.hIconSm		= LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SWITCHTODEMO));
 
@@ -78,17 +81,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
 	// Create main window.
    hInst = hInstance;
-   HWND hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
-   if (!hWnd) return FALSE;
+   hMainWnd = CreateWindowEx(
+	   WS_EX_LAYERED|WS_EX_TOPMOST|WS_EX_TOOLWINDOW, 
+	   szWindowClass, szTitle, WS_POPUP,
+	   0, 0, 640, 480, NULL, NULL, hInstance, NULL);
+   if (!hMainWnd) return FALSE;
 
    // Register Hot-key "Windows + H".
-   RegisterHotKey(hWnd, 0, MOD_WIN, 'H');
+   RegisterHotKey(hMainWnd, 0, MOD_WIN, 'H');
    
    // Setup task tray icon.
-   SetupTaskTrayIcon(hWnd);
+   SetupTaskTrayIcon(hMainWnd);
 
-   ShowWindow(hWnd, SW_HIDE);
+   ShowWindow(hMainWnd, SW_HIDE);
 
    return TRUE;
 }
@@ -197,8 +202,8 @@ HWND FindSlideShowWindow()
 
 HWND FindApplicationWindow()
 {
-	// Microsoft PowerPoint (2010Beta) 
-	HWND hAppWnd = FindWindow(TEXT("PP12FrameClass"), NULL);
+	// Microsoft PowerPoint (2010) 
+	HWND hAppWnd = FindWindow(TEXT("PPTFrameClass"), NULL);
 	if (IsWindow(hAppWnd) == FALSE)
 		// Kingsoft Presentation (2010) 
 		hAppWnd = FindWindow(TEXT("TfmMain.UnicodeClass"), NULL);
@@ -220,8 +225,32 @@ void OnHotKey(HWND hWnd)
 	if (IsWindow(hSlideShowWnd))
 	{
 		BOOL isVisible = IsWindowVisible(hSlideShowWnd);
+		FadeMainWnd(TRUE);
 		ShowWindow(hSlideShowWnd, isVisible ? SW_HIDE : SW_SHOW);
+		FadeMainWnd(FALSE);
 		if (!isVisible) SetForegroundWindow(hSlideShowWnd);
 	}
 }
 
+void FadeMainWnd(BOOL bFadeIn)
+{
+	int base = bFadeIn ? 0 : 255;
+	if (bFadeIn)
+	{
+		SetLayeredWindowAttributes(hMainWnd, 0, 0, LWA_ALPHA);
+		ShowWindow(hMainWnd, SW_MAXIMIZE);
+		SetForegroundWindow(hMainWnd);
+		BringWindowToTop(hMainWnd);
+	}
+	for(int i=0; i<256; i+=16)
+	{
+		int alpha = abs(base - i);
+		SetLayeredWindowAttributes(hMainWnd, 0, alpha, LWA_ALPHA);
+		UpdateWindow(hMainWnd);
+		Sleep(30);
+	}
+	if(!bFadeIn)
+	{
+		ShowWindow(hMainWnd, SW_HIDE);
+	}
+}
