@@ -3,4 +3,7 @@
 *.suo
 Debug
 ipch
+Release
+*.user
+*.aps
 </Value></Property></Properties></ItemProperties>
