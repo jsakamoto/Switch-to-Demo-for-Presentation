@@ -87,8 +87,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	   0, 0, 640, 480, NULL, NULL, hInstance, NULL);
    if (!hMainWnd) return FALSE;
 
-   // Register Hot-key "Windows + H".
-   RegisterHotKey(hMainWnd, 0, MOD_WIN, 'H');
+   // Register Hot-key "Windows + Shift + H".
+   RegisterHotKey(hMainWnd, 0, MOD_WIN|MOD_SHIFT, 'H');
    
    // Setup task tray icon.
    SetupTaskTrayIcon(hMainWnd);
@@ -108,7 +108,7 @@ void SetupTaskTrayIcon(HWND hWnd)
    lstrcpy(nid.szTip, szTitle);
    nid.uCallbackMessage = WM_TRAYICONMESSAGE;
    lstrcpy(nid.szInfoTitle, szTitle);
-   lstrcpy(nid.szInfo, TEXT("Enter hot-key \"Win + H\" to Show or Hide Slide-show."));
+   lstrcpy(nid.szInfo, TEXT("Enter hot-key \"Win + Shift + H\" to Show or Hide Slide-show."));
    nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE|NIF_INFO;
    Shell_NotifyIcon(NIM_ADD, &nid);
 }
@@ -192,7 +192,7 @@ void OnTaskTrayMessage(HWND hWnd, LPARAM lParam)
 
 HWND FindSlideShowWindow()
 {
-	// Microsoft PowerPoint (2007 Viewer, 2010Beta) 
+	// Microsoft PowerPoint (2007 Viewer, 2010-2013) 
 	HWND hSlideShowWnd = FindWindow(TEXT("screenClass"), NULL);
 	if (IsWindow(hSlideShowWnd) == FALSE)
 		// Kingsoft Presentation (2010) 
@@ -202,7 +202,7 @@ HWND FindSlideShowWindow()
 
 HWND FindApplicationWindow()
 {
-	// Microsoft PowerPoint (2010) 
+	// Microsoft PowerPoint (2010-2013) 
 	HWND hAppWnd = FindWindow(TEXT("PPTFrameClass"), NULL);
 	if (IsWindow(hAppWnd) == FALSE)
 		// Kingsoft Presentation (2010) 
