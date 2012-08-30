@@ -21,6 +21,7 @@ void OnHotKey(HWND);
 void OnTaskTrayMessage(HWND hWnd, LPARAM lParam);
 HWND FindApplicationWindow();
 HWND FindSlideShowWindow();
+BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd , LPARAM lParam);
 void FadeMainWnd(BOOL bFadeIn);
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
@@ -193,12 +194,35 @@ void OnTaskTrayMessage(HWND hWnd, LPARAM lParam)
 HWND FindSlideShowWindow()
 {
 	// Microsoft PowerPoint (2007 Viewer, 2010-2013) 
-	HWND hSlideShowWnd = FindWindow(TEXT("screenClass"), NULL);
+	HWND hSlideShowWnd = NULL;
+	EnumWindows(FindPowerPointSlideShowWindiwProc, (LPARAM)&hSlideShowWnd);
+	
 	if (IsWindow(hSlideShowWnd) == FALSE)
 		// Kingsoft Presentation (2010) 
 		hSlideShowWnd = FindWindow(TEXT("TSlideShowDlg.UnicodeClass"), NULL);
 	return hSlideShowWnd;
 }
+
+BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd , LPARAM lParam)
+{
+	// Find by Window Class Name...
+	TCHAR szClassName[50];
+	GetClassName(hwnd, szClassName, sizeof(szClassName)/sizeof(TCHAR));
+	if(lstrcmp(szClassName, TEXT("screenClass")) != 0) return TRUE;
+
+	// But exclude Presenter View.
+	TCHAR szCaption[400];
+	GetWindowText(hwnd, szCaption, sizeof(szCaption)/sizeof(TCHAR));
+	LPCTSTR pNGWord = TEXT("Presenter View");
+	int begin = lstrlen(szCaption) - lstrlen(pNGWord);
+	begin = max(0, begin);
+	if(lstrcmp(&szCaption[begin], pNGWord) == 0) return TRUE;
+
+	HWND* phSlideShowWnd = (HWND*)lParam;
+	*phSlideShowWnd = hwnd;
+	return FALSE;
+}
+
 
 HWND FindApplicationWindow()
 {
@@ -225,8 +249,18 @@ void OnHotKey(HWND hWnd)
 	if (IsWindow(hSlideShowWnd))
 	{
 		BOOL isVisible = IsWindowVisible(hSlideShowWnd);
+		if (isVisible)
+		{
+			RECT rcWnd;
+			GetWindowRect(hSlideShowWnd, &rcWnd);
+			SetWindowPos(
+				hMainWnd, NULL, rcWnd.left, rcWnd.top,
+				rcWnd.right - rcWnd.left, rcWnd.bottom - rcWnd.top,
+				SWP_NOZORDER);
+		}
 		FadeMainWnd(TRUE);
 		ShowWindow(hSlideShowWnd, isVisible ? SW_HIDE : SW_SHOW);
+		if (isVisible) SetForegroundWindow(GetDesktopWindow());
 		FadeMainWnd(FALSE);
 		if (!isVisible) SetForegroundWindow(hSlideShowWnd);
 	}
@@ -238,7 +272,7 @@ void FadeMainWnd(BOOL bFadeIn)
 	if (bFadeIn)
 	{
 		SetLayeredWindowAttributes(hMainWnd, 0, 0, LWA_ALPHA);
-		ShowWindow(hMainWnd, SW_MAXIMIZE);
+		ShowWindow(hMainWnd, SW_SHOWNORMAL);
 		SetForegroundWindow(hMainWnd);
 		BringWindowToTop(hMainWnd);
 	}
