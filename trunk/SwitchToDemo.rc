@@ -1,7 +1,11 @@
+// Microsoft Visual C++ generated resource script.
+//
 #include "resource.h"
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
 //
 #ifndef APSTUDIO_INVOKED
 #include "targetver.h"
@@ -9,11 +13,15 @@
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
 #undef APSTUDIO_HIDDEN_SYMBOLS
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+/////////////////////////////////////////////////////////////////////////////
+// Japanese (Japan) resources
+
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-LANGUAGE 17, 1
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
 
 /////////////////////////////////////////////////////////////////////////////
@@ -21,7 +29,9 @@ LANGUAGE 17, 1
 // Icon
 //
 
-IDI_SWITCHTODEMO       ICON         "SlideShow.ico"
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SWITCHTODEMO        ICON                    "SlideShow.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -32,31 +42,26 @@ IDC_SWITCHTODEMO MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "E&xit",                IDM_EXIT
+        MENUITEM "&Configuration",              ID_FILE_CONFIGURATION
+        MENUITEM "E&xit",                       IDM_EXIT
     END
 END
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-#endif    // APSTUDIO_INVOKED
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
-1 TEXTINCLUDE
+
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
-	"#ifndef APSTUDIO_INVOKED\r\n"
+    "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
     "#endif\r\n"
     "#define APSTUDIO_HIDDEN_SYMBOLS\r\n"
@@ -65,7 +70,7 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -73,18 +78,61 @@ END
 
 #endif    // APSTUDIO_INVOKED
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
-// String table
+// Dialog
+//
+
+IDD_CONFIG DIALOGEX 0, 0, 257, 83
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTERMOUSE | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Configuration - Switch to Demo"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Hotkey",IDC_STATIC,7,16,24,8
+    CONTROL         "&Win +",IDC_MODWIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,40,16,32,10
+    CONTROL         "&Shift +",IDC_MODSHIFT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,16,35,10
+    CONTROL         "&Ctrl +",IDC_MODCTRL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,110,16,32,10
+    CONTROL         "&Alt +",IDC_MODALT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,143,16,32,10
+    LTEXT           "&Key",IDC_STATIC,236,17,13,8
+    COMBOBOX        IDC_KEY,174,14,59,200,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&OK",IDOK,146,62,50,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,200,62,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 250
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
 //
 
 STRINGTABLE
 BEGIN
-   IDC_SWITCHTODEMO   "SWITCHTODEMO"
-   IDS_APP_TITLE       "Switch To Demo"
+    IDS_APP_TITLE           "Switch To Demo"
+    IDC_SWITCHTODEMO        "SWITCHTODEMO"
 END
 
-#endif
+#endif    // Japanese (Japan) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -92,11 +140,12 @@ END
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
+// Generated from the TEXTINCLUDE 3 resource.
 //
 
 VS_VERSION_INFO    VERSIONINFO 
-FILEVERSION        1,3,0,0
-PRODUCTVERSION     1,3,0,0
+FILEVERSION        1,4,0,0
+PRODUCTVERSION     1,4,0,0
 FILEFLAGSMASK      VS_FFI_FILEFLAGSMASK 
 FILEFLAGS          0x00000000L
 FILEOS             VOS__WINDOWS32
@@ -114,13 +163,14 @@ BEGIN
         BEGIN
             VALUE "CompanyName",      ""
             VALUE "FileDescription",  "Switch to Demo for Presentation"
-            VALUE "FileVersion",      "1.3.0\0"
+            VALUE "FileVersion",      "1.4.0\0"
             VALUE "OriginalFilename", "SwitchToDemo.exe\0"
             VALUE "ProductName",      "Switch to Demo for Presentation\0"
-            VALUE "ProductVersion",   "1.3.0\0"
+            VALUE "ProductVersion",   "1.4.0\0"
         END 
     END
 END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+

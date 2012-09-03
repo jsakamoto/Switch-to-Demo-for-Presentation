@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include <math.h>
 #include "SwitchToDemo.h"
+#include "ConfigDialog.h"
+#include "Config.h"
 
 #define MAX_LOADSTRING 100
 #define WM_TRAYICONMESSAGE	(WM_USER + 1)
+#define WM_PINGPREVINSTANCE	(WM_USER + 2)
 
 // Global variables.
 HINSTANCE hInst;
@@ -11,11 +14,13 @@ TCHAR szTitle[MAX_LOADSTRING];
 TCHAR szWindowClass[MAX_LOADSTRING];
 UINT WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
 HWND hMainWnd;
+TCHAR szConfigPath[MAX_PATH];
+LPCTSTR pszConfigSection = TEXT("SwitchToDemo");
 
 // Function prototypes.
-ATOM				MyRegisterClass(HINSTANCE hInstance);
-BOOL				InitInstance(HINSTANCE, int);
-LRESULT CALLBACK	WndProc(HWND, UINT, WPARAM, LPARAM);
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void SetupTaskTrayIcon(HWND hWnd);
 void OnHotKey(HWND);
 void OnTaskTrayMessage(HWND hWnd, LPARAM lParam);
@@ -23,6 +28,7 @@ HWND FindApplicationWindow();
 HWND FindSlideShowWindow();
 BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd , LPARAM lParam);
 void FadeMainWnd(BOOL bFadeIn);
+void Configuration(HWND hwnd);
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
                      HINSTANCE hPrevInstance,
@@ -32,11 +38,16 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
-	MSG msg;
-
 	// Initialize global strings.
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_SWITCHTODEMO, szWindowClass, MAX_LOADSTRING);
+
+	HWND hPrevInstanceHwnd = FindWindow(szWindowClass, NULL);
+	if (IsWindow(hPrevInstanceHwnd))
+	{
+		PostMessage(hPrevInstanceHwnd, WM_PINGPREVINSTANCE, 0, 0);
+		return 200;
+	}
 	MyRegisterClass(hInstance);
 
 	// Initialize applicationinstance.
@@ -46,6 +57,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	}
 
 	// Main message loop.
+	MSG msg;
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -80,38 +92,52 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
+	//InitCommonControls();
+
+	GetModuleFileName(NULL, szConfigPath, MAX_PATH);
+	lstrcat(szConfigPath, TEXT(".ini"));
+
+	// Load configuration.
+	g_Config.Hotkey = GetPrivateProfileInt(pszConfigSection, TEXT("Hotkey"), MAKEWORD('H', MOD_WIN|MOD_SHIFT), szConfigPath);
+	GetPrivateProfileString(pszConfigSection, TEXT("HotkeyDisplayName"), TEXT("Win + Shift + H"), g_Config.szHotkeyDisplayName, sizeof(g_Config.szHotkeyDisplayName)/sizeof(TCHAR), szConfigPath);
+
 	// Create main window.
-   hInst = hInstance;
-   hMainWnd = CreateWindowEx(
+	hInst = hInstance;
+	hMainWnd = CreateWindowEx(
 	   WS_EX_LAYERED|WS_EX_TOPMOST|WS_EX_TOOLWINDOW, 
 	   szWindowClass, szTitle, WS_POPUP,
 	   0, 0, 640, 480, NULL, NULL, hInstance, NULL);
-   if (!hMainWnd) return FALSE;
+	if (!hMainWnd) return FALSE;
 
-   // Register Hot-key "Windows + Shift + H".
-   RegisterHotKey(hMainWnd, 0, MOD_WIN|MOD_SHIFT, 'H');
+	// Register Hot-key "Windows + Shift + H".
+	BYTE mod = HIBYTE(g_Config.Hotkey);
+	BYTE vkey = LOBYTE(g_Config.Hotkey);
+	RegisterHotKey(hMainWnd, 0, mod, vkey);
    
-   // Setup task tray icon.
-   SetupTaskTrayIcon(hMainWnd);
+	// Setup task tray icon.
+	SetupTaskTrayIcon(hMainWnd);
 
-   ShowWindow(hMainWnd, SW_HIDE);
+	ShowWindow(hMainWnd, SW_HIDE);
 
-   return TRUE;
+	return TRUE;
 }
 
 void SetupTaskTrayIcon(HWND hWnd)
 {
-   NOTIFYICONDATA nid;
-   ZeroMemory(&nid, sizeof(nid));
-   nid.cbSize = sizeof(nid);
-   nid.hWnd = hWnd;
-   nid.hIcon = (HICON)LoadImage(hInst,MAKEINTRESOURCE(IDI_SWITCHTODEMO),IMAGE_ICON,16,16,LR_SHARED);
-   lstrcpy(nid.szTip, szTitle);
-   nid.uCallbackMessage = WM_TRAYICONMESSAGE;
-   lstrcpy(nid.szInfoTitle, szTitle);
-   lstrcpy(nid.szInfo, TEXT("Enter hot-key \"Win + Shift + H\" to Show or Hide Slide-show."));
-   nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE|NIF_INFO;
-   Shell_NotifyIcon(NIM_ADD, &nid);
+	NOTIFYICONDATA nid;
+	ZeroMemory(&nid, sizeof(nid));
+	nid.cbSize = sizeof(nid);
+	nid.hWnd = hWnd;
+
+	Shell_NotifyIcon(NIM_DELETE, &nid);
+
+	nid.hIcon = (HICON)LoadImage(hInst,MAKEINTRESOURCE(IDI_SWITCHTODEMO),IMAGE_ICON,16,16,LR_SHARED);
+	nid.uCallbackMessage = WM_TRAYICONMESSAGE;
+	lstrcpy(nid.szInfoTitle, szTitle);
+	wsprintf(nid.szTip, TEXT("%s (Hotkey is %s)"), szTitle, g_Config.szHotkeyDisplayName);
+	wsprintf(nid.szInfo, TEXT("Enter hot-key \"%s\" to Show or Hide Slide-show."), g_Config.szHotkeyDisplayName);
+	nid.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE|NIF_INFO;
+	Shell_NotifyIcon(NIM_ADD, &nid);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -130,6 +156,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
+		case ID_FILE_CONFIGURATION:
+			Configuration(hWnd);
+			break;
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
@@ -143,7 +172,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_TRAYICONMESSAGE:
 		OnTaskTrayMessage(hWnd, lParam);
 		break;
-
+	case WM_PINGPREVINSTANCE:
+		SetupTaskTrayIcon(hWnd);
+		break;
 	case WM_DESTROY:
 		{
 			HWND hSlideShowWnd = FindSlideShowWindow();
@@ -223,7 +254,6 @@ BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd , LPARAM lParam)
 	return FALSE;
 }
 
-
 HWND FindApplicationWindow()
 {
 	// Microsoft PowerPoint (2010-2013) 
@@ -287,4 +317,27 @@ void FadeMainWnd(BOOL bFadeIn)
 	{
 		ShowWindow(hMainWnd, SW_HIDE);
 	}
+}
+
+void Configuration(HWND hwnd)
+{
+	Config prevConfig = g_Config;
+	UnregisterHotKey(hwnd, 0);
+
+	INT result = DialogBox(hInst, MAKEINTRESOURCE(IDD_CONFIG), GetDesktopWindow(), ConfigDialogProc);
+	if(result == IDOK)
+	{
+		// Save configuration.
+		TCHAR szHotkeyInt[100];
+		wsprintf(szHotkeyInt, TEXT("%d"), g_Config.Hotkey);
+		WritePrivateProfileString(pszConfigSection, TEXT("Hotkey"), szHotkeyInt, szConfigPath);
+		WritePrivateProfileString(pszConfigSection, TEXT("HotkeyDisplayName"), g_Config.szHotkeyDisplayName, szConfigPath);
+	}
+
+	BYTE mod = HIBYTE(g_Config.Hotkey);
+	BYTE vkey = LOBYTE(g_Config.Hotkey);
+	RegisterHotKey(hwnd, 0, mod, vkey);
+
+	if (prevConfig.Hotkey != g_Config.Hotkey)
+		SetupTaskTrayIcon(hwnd);
 }
