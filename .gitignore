@@ -1,0 +1,14 @@
+*.suo
+
+/trunk/ipch
+
+/trunk/SwitchToDemo/Release
+/trunk/SwitchToDemoBootstrap/publish
+/trunk/SwitchToDemoBootstrap/bin
+/trunk/SwitchToDemoBootstrap/obj
+
+*.user
+
+/trunk/*.sdf
+
+*.aps
