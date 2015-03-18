@@ -1,8 +1,10 @@
 *.suo
 *.user
 *.sdf
+*.opensdf
 *.aps
 bin/
 obj/
 Release/
+Debug/
 publish/
