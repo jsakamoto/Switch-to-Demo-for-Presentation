@@ -22,13 +22,13 @@
     <UpdatePeriodically>true</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://switchtodemo.codeplex.com/releases/clickonce/</InstallUrl>
+    <InstallUrl>http://clickonceget.azurewebsites.net/app/SwitchToDemoBootstrap/</InstallUrl>
     <SupportUrl>https://switchtodemo.codeplex.com/</SupportUrl>
     <ProductName>Switch to Demo for Presentation</ProductName>
     <PublisherName>J.Sakamoto</PublisherName>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.4.1.0</ApplicationVersion>
+    <ApplicationVersion>1.4.2.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>false</BootstrapperEnabled>
