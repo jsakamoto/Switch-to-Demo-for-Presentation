@@ -1,4 +1,4 @@
-# Switch to Demo for Presentation
+# ![favicon](contents/SlideShow_256.png) Switch to Demo for Presentation
 
 ## Summary / 概要
 
@@ -12,7 +12,7 @@ Win キー + Shift + H を押すと、PowerPoint のスライドショー画面�
 
 ## Usage (movie) / 使い方 (動画)
 
-[![x](contents/thumbnail-of-movie.png)](https://youtu.be/MbPbKf_mCaw)
+[![thumbnail of usage movie](contents/thumbnail-of-movie.png)](https://youtu.be/MbPbKf_mCaw)
 
 ## Publishing Point / 配布場所
 
