@@ -6,6 +6,13 @@
 #include "SlideShowWnds.h"
 #include "Utility.h"
 
+#pragma comment(linker,"/manifestdependency:\"type='win32' \
+  name='Microsoft.Windows.Common-Controls' \
+  version='6.0.0.0' \
+  processorArchitecture='x86' \
+  publicKeyToken='6595b64144ccf1df' \
+  language='*'\"") 
+
 #define MAX_LOADSTRING 100
 #define WM_TRAYICONMESSAGE	(WM_USER + 1)
 #define WM_PINGPREVINSTANCE	(WM_USER + 2)
@@ -162,6 +169,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+	case WM_CREATE:
+		InitCommonControls();
+		break;
 	case WM_COMMAND:
 		wmId = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
