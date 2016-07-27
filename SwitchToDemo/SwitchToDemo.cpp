@@ -3,6 +3,8 @@
 #include "SwitchToDemo.h"
 #include "ConfigDialog.h"
 #include "Config.h"
+#include "SlideShowWnds.h"
+#include "Utility.h"
 
 #define MAX_LOADSTRING 100
 #define WM_TRAYICONMESSAGE	(WM_USER + 1)
@@ -16,6 +18,8 @@ UINT WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
 HWND hMainWnd;
 TCHAR szConfigPath[MAX_PATH];
 LPCTSTR pszConfigSection = TEXT("SwitchToDemo");
+RECT rcLastSlideShowWndPos;
+RECT rcLastPresenterViewWndPos;
 
 // Function prototypes.
 ATOM MyRegisterClass(HINSTANCE hInstance);
@@ -25,10 +29,18 @@ void SetupTaskTrayIcon(HWND hWnd);
 void OnHotKey(HWND);
 void OnTaskTrayMessage(HWND hWnd, LPARAM lParam);
 HWND FindApplicationWindow();
-HWND FindSlideShowWindow();
+SLIDESHOWWNDS FindSlideShowWindow();
 BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd, LPARAM lParam);
 void FadeMainWnd(BOOL bFadeIn);
 void Configuration(HWND hwnd);
+void RestoreVisibility(HWND hWnd);
+#define MULTIMONITORMODE_CLONE 0
+#define MULTIMONITORMODE_EXTEND 1
+void SwitchMultiMonitorMode(int mode);
+
+#define ACTION_TO_SHOW 1
+#define ACTION_TO_HIDE 2
+
 
 int APIENTRY wWinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -41,6 +53,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance,
 	// Initialize global strings.
 	LoadString(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadString(hInstance, IDC_SWITCHTODEMO, szWindowClass, MAX_LOADSTRING);
+	ZeroMemory(&rcLastSlideShowWndPos, sizeof(rcLastSlideShowWndPos));
+	ZeroMemory(&rcLastPresenterViewWndPos, sizeof(rcLastPresenterViewWndPos));
 
 	HWND hPrevInstanceHwnd = FindWindow(szWindowClass, NULL);
 	if (IsWindow(hPrevInstanceHwnd))
@@ -177,12 +191,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_DESTROY:
 	{
-		HWND hSlideShowWnd = FindSlideShowWindow();
-		if (IsWindow(hSlideShowWnd) && IsWindowVisible(hSlideShowWnd) == FALSE)
-		{
-			ShowWindow(hSlideShowWnd, SW_SHOW);
-			SetForegroundWindow(hSlideShowWnd);
-		}
+		SLIDESHOWWNDS slideHwnds = FindSlideShowWindow();
+		RestoreVisibility(slideHwnds.hSlideShowWnd);
+		RestoreVisibility(slideHwnds.hPresenterViewWnd);
 
 		NOTIFYICONDATA nid;
 		ZeroMemory(&nid, sizeof(nid));
@@ -208,6 +219,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void RestoreVisibility(HWND hWnd) {
+	if (IsWindow(hWnd) && IsWindowVisible(hWnd) == FALSE)
+	{
+		ShowWindow(hWnd, SW_SHOW);
+		SetForegroundWindow(hWnd);
+	}
+}
+
 void OnTaskTrayMessage(HWND hWnd, LPARAM lParam)
 {
 	if (lParam == WM_RBUTTONDOWN)
@@ -222,36 +241,44 @@ void OnTaskTrayMessage(HWND hWnd, LPARAM lParam)
 	}
 }
 
-HWND FindSlideShowWindow()
+SLIDESHOWWNDS FindSlideShowWindow()
 {
 	// Microsoft PowerPoint (2007 Viewer, 2010-2013) 
-	HWND hSlideShowWnd = NULL;
-	EnumWindows(FindPowerPointSlideShowWindiwProc, (LPARAM)&hSlideShowWnd);
+	SLIDESHOWWNDS slideHwnds;
+	ZeroMemory(&slideHwnds, sizeof(slideHwnds));
+	EnumWindows(FindPowerPointSlideShowWindiwProc, (LPARAM)&slideHwnds);
 
-	if (IsWindow(hSlideShowWnd) == FALSE)
+	if (IsWindow(slideHwnds.hSlideShowWnd) == FALSE) {
 		// Kingsoft Presentation (2010) 
-		hSlideShowWnd = FindWindow(TEXT("TSlideShowDlg.UnicodeClass"), NULL);
-	return hSlideShowWnd;
+		slideHwnds.hSlideShowWnd = FindWindow(TEXT("TSlideShowDlg.UnicodeClass"), NULL);
+		slideHwnds.hPresenterViewWnd = NULL;
+	}
+	return slideHwnds;
 }
 
 BOOL CALLBACK FindPowerPointSlideShowWindiwProc(HWND hwnd, LPARAM lParam)
 {
+	SLIDESHOWWNDS* pSlideShowWnds = (SLIDESHOWWNDS*)lParam;
+
 	// Find by Window Class Name...
 	TCHAR szClassName[50];
 	GetClassName(hwnd, szClassName, sizeof(szClassName) / sizeof(TCHAR));
 	if (lstrcmp(szClassName, TEXT("screenClass")) != 0) return TRUE;
 
-	// But exclude Presenter View.
+	// and detect Presenter View.
 	TCHAR szCaption[400];
 	GetWindowText(hwnd, szCaption, sizeof(szCaption) / sizeof(TCHAR));
 	LPCTSTR pNGWord = TEXT("Presenter View");
 	int begin = lstrlen(szCaption) - lstrlen(pNGWord);
 	begin = max(0, begin);
-	if (lstrcmp(&szCaption[begin], pNGWord) == 0) return TRUE;
+	if (lstrcmp(&szCaption[begin], pNGWord) == 0) {
+		pSlideShowWnds->hPresenterViewWnd = hwnd;
+	}
+	else {
+		pSlideShowWnds->hSlideShowWnd = hwnd;
+	}
 
-	HWND* phSlideShowWnd = (HWND*)lParam;
-	*phSlideShowWnd = hwnd;
-	return FALSE;
+	return IsWindow(pSlideShowWnds->hSlideShowWnd) && IsWindow(pSlideShowWnds->hPresenterViewWnd) ? FALSE : TRUE;
 }
 
 HWND FindApplicationWindow()
@@ -266,33 +293,55 @@ HWND FindApplicationWindow()
 
 void OnHotKey(HWND hWnd)
 {
-	HWND hAppWnd = FindApplicationWindow();
-	HWND hSlideShowWnd = FindSlideShowWindow();
+	// Find slideshow window, and if not found then nothing to do.
+	SLIDESHOWWNDS slideWnds = FindSlideShowWindow();
+	HWND hSlideShowWnd = slideWnds.hSlideShowWnd;
+	HWND hPresenterViewWnd = slideWnds.hPresenterViewWnd;
+	if (!IsWindow(hSlideShowWnd)) return;
 
 	// Minimize application window.
+	HWND hAppWnd = FindApplicationWindow();
 	if (IsWindow(hAppWnd) && IsWindow(hSlideShowWnd))
 	{
 		ShowWindow(hAppWnd, SW_SHOWMINNOACTIVE);
 	}
 
 	// Hide or Show slide-show window.
-	if (IsWindow(hSlideShowWnd))
-	{
-		BOOL isVisible = IsWindowVisible(hSlideShowWnd);
-		if (isVisible)
-		{
-			RECT rcWnd;
-			GetWindowRect(hSlideShowWnd, &rcWnd);
-			SetWindowPos(
-				hMainWnd, NULL, rcWnd.left, rcWnd.top,
-				rcWnd.right - rcWnd.left, rcWnd.bottom - rcWnd.top,
-				SWP_NOZORDER);
-		}
+	BOOL visible = IsWindowVisible(hSlideShowWnd);
+	int action = visible ? ACTION_TO_HIDE : ACTION_TO_SHOW;
+	BOOL enablePresenterView = IsWindow(hPresenterViewWnd);
+
+	if (action == ACTION_TO_HIDE) {
+		GetWindowRect(hSlideShowWnd, &rcLastSlideShowWndPos);
+		if (enablePresenterView) GetWindowRect(hPresenterViewWnd, &rcLastPresenterViewWndPos);
+
+		SetWindowPos(hMainWnd, rcLastSlideShowWndPos);
 		FadeMainWnd(TRUE);
-		ShowWindow(hSlideShowWnd, isVisible ? SW_HIDE : SW_SHOW);
-		if (isVisible) SetForegroundWindow(GetDesktopWindow());
+
+		HideWindow(slideWnds);
+
+		SetForegroundWindow(GetDesktopWindow());
+
 		FadeMainWnd(FALSE);
-		if (!isVisible) SetForegroundWindow(hSlideShowWnd);
+
+		if (enablePresenterView) SwitchMultiMonitorMode(MULTIMONITORMODE_CLONE);
+	}
+	else // action == ACTION_TO_SHOW
+	{
+		if (enablePresenterView) SwitchMultiMonitorMode(MULTIMONITORMODE_EXTEND);
+
+		SetWindowPos(hMainWnd, rcLastSlideShowWndPos);
+		FadeMainWnd(TRUE);
+
+		SetWindowPos(hSlideShowWnd, rcLastSlideShowWndPos);
+		SetWindowPos(hPresenterViewWnd, rcLastPresenterViewWndPos);
+
+		ShowWindow(slideWnds);
+
+		FadeMainWnd(FALSE);
+
+		SetForegroundWindow(hSlideShowWnd);
+		if (enablePresenterView) SetForegroundWindow(hPresenterViewWnd);
 	}
 }
 
@@ -340,4 +389,16 @@ void Configuration(HWND hwnd)
 
 	if (prevConfig.Hotkey != g_Config.Hotkey)
 		SetupTaskTrayIcon(hwnd);
+}
+
+void SwitchMultiMonitorMode(int mode)
+{
+	switch (mode) {
+	case MULTIMONITORMODE_CLONE:
+		SetDisplayConfig(0, NULL, 0, NULL, SDC_TOPOLOGY_CLONE | SDC_APPLY);
+		break;
+	case MULTIMONITORMODE_EXTEND:
+		SetDisplayConfig(0, NULL, 0, NULL, SDC_TOPOLOGY_EXTEND | SDC_APPLY);
+		break;
+	}
 }
