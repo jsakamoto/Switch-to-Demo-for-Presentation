@@ -24,31 +24,6 @@
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_SWITCHTODEMO        ICON                    "SlideShow.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Menu
-//
-
-IDC_SWITCHTODEMO MENU
-BEGIN
-    POPUP "&File"
-    BEGIN
-        MENUITEM "&Configuration",              ID_FILE_CONFIGURATION
-        MENUITEM "E&xit",                       IDM_EXIT
-    END
-END
-
-
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -78,6 +53,41 @@ BEGIN
 END
 
 #endif    // APSTUDIO_INVOKED
+
+#endif    // Japanese (Japan) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SWITCHTODEMO        ICON                    "SlideShow.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDC_SWITCHTODEMO MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Configuration",              ID_FILE_CONFIGURATION
+        MENUITEM "E&xit",                       IDM_EXIT
+    END
+END
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -126,28 +136,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// String Table
-//
-
-STRINGTABLE
-BEGIN
-    IDS_APP_TITLE           "Switch To Demo"
-    IDC_SWITCHTODEMO        "SWITCHTODEMO"
-END
-
-#endif    // Japanese (Japan) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (United States) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Version
 //
 
@@ -183,7 +171,19 @@ BEGIN
     END
 END
 
-#endif    // English (United States) resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_APP_TITLE           "Switch To Demo"
+    IDC_SWITCHTODEMO        "SWITCHTODEMO"
+END
+
+#endif    // English resources
 /////////////////////////////////////////////////////////////////////////////
 
 
