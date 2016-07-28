@@ -15,6 +15,7 @@
 #define IDC_MODCTRL                     1004
 #define IDC_MODALT                      1005
 #define IDC_KEY                         1007
+#define IDC_CHECK1                      1008
 #define ID_FILE_CONFIGURATION           32771
 #define IDC_STATIC                      -1
 
@@ -25,7 +26,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1009
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

@@ -121,6 +121,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	// Load configuration.
 	g_Config.Hotkey = GetPrivateProfileInt(pszConfigSection, TEXT("Hotkey"), MAKEWORD('H', MOD_WIN | MOD_SHIFT), szConfigPath);
 	GetPrivateProfileString(pszConfigSection, TEXT("HotkeyDisplayName"), TEXT("Win + Shift + H"), g_Config.szHotkeyDisplayName, sizeof(g_Config.szHotkeyDisplayName) / sizeof(TCHAR), szConfigPath);
+	g_Config.AutoChangeMultiMonitorMode = GetPrivateProfileInt(pszConfigSection, TEXT("AutoChangeMultiMonitorMode"), 1, szConfigPath) == 1;
 
 	// Create main window.
 	hInst = hInstance;
@@ -387,10 +388,12 @@ void Configuration(HWND hwnd)
 	if (result == IDOK)
 	{
 		// Save configuration.
-		TCHAR szHotkeyInt[100];
-		wsprintf(szHotkeyInt, TEXT("%d"), g_Config.Hotkey);
-		WritePrivateProfileString(pszConfigSection, TEXT("Hotkey"), szHotkeyInt, szConfigPath);
+		TCHAR szInt[100];
+		wsprintf(szInt, TEXT("%d"), g_Config.Hotkey);
+		WritePrivateProfileString(pszConfigSection, TEXT("Hotkey"), szInt, szConfigPath);
 		WritePrivateProfileString(pszConfigSection, TEXT("HotkeyDisplayName"), g_Config.szHotkeyDisplayName, szConfigPath);
+		wsprintf(szInt, TEXT("%d"), g_Config.AutoChangeMultiMonitorMode ? 1 : 0);
+		WritePrivateProfileString(pszConfigSection, TEXT("AutoChangeMultiMonitorMode"), szInt, szConfigPath);
 	}
 
 	BYTE mod = HIBYTE(g_Config.Hotkey);
@@ -403,6 +406,8 @@ void Configuration(HWND hwnd)
 
 void SwitchMultiMonitorMode(int mode)
 {
+	if (g_Config.AutoChangeMultiMonitorMode == FALSE) return;
+
 	switch (mode) {
 	case MULTIMONITORMODE_CLONE:
 		SetDisplayConfig(0, NULL, 0, NULL, SDC_TOPOLOGY_CLONE | SDC_APPLY);
