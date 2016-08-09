@@ -37,8 +37,8 @@ You will encounter security warning uring installation. Please open the [More in
 
 - Very easy to from download and install to launch the app powered by **ClickOnce** Technology.
  - If you chose [Zip archived edition](https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/ver.1.4.1), You only download and execute a single .exe file to use. You don't need any runtime library. ex) .NET Framework, and etc.
-- Support for Microsoft PowerPoint 2007, 2010, and 2013 (include viewer).
- - at Windows 7 and Windows 8.
+- Support for Microsoft PowerPoint 2007, 2010, 2013, and 2016 (include viewer).
+ - at Windows 7, 8, 10 Anniversary Update 1607 Build 14393. 
 - Implemented by C++ & Win32 SDK. (exclude ClickOnce boot strapper.)
  - Minimal footprint.
 
@@ -48,7 +48,7 @@ You will encounter security warning uring installation. Please open the [More in
 - **ClickOnce** テクノロジにより、ダウンロードからインストール、実行まで、手間なし一直線。
  - [Zip圧縮版](https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/ver.1.4.1)ならダウンロードして解凍後、.exe 一本、実行するだけ。.NET Framework 等、ランタイム不要。
 
-- 現時点で Microsoft PowerPoint の 2007、2010、2013 (含む Viewer) に対応。
-  - Windows 8 Pro (x64) で動作確認。
+- 現時点で Microsoft PowerPoint の 2007、2010、2013、2016 (含む Viewer) に対応。
+  - Windows 10 Pro (x64) Anniversary Update 1607 Build 14393 で動作確認。
 - C++ & Win32 SDK だけで記述。(ClickOnce のブートストラップは除く)
  - 最小のフットプリント。
