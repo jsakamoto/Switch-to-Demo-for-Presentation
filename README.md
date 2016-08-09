@@ -37,7 +37,7 @@ You will encounter security warning uring installation. Please open the [More in
 
 ### Zip archived Edition / Zip 圧縮版
 
-[https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/ver.1.4.1](https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/ver.1.4.1)
+[https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/v.1.5.0](https://github.com/jsakamoto/Switch-to-Demo-for-Presentation/releases/tag/v.1.5.0)
 
 ## Features
 
