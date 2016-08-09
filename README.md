@@ -24,11 +24,13 @@ Win キー + Shift + H を押すと、PowerPoint のスライドショー画面�
 
 [http://clickonceget.azurewebsites.net/app/SwitchToDemoBootstrap](http://clickonceget.azurewebsites.net/app/SwitchToDemoBootstrap)
 
-I recommend use Internet Explorer to open above URL.  
-インターネットエクスプローラーを使って上記URLを開くことをお勧めします。
+I recommend use "Microsoft Edge" Browser or Internet Explorer to open above URL.  
+"Microsoft Edge" ブラウザ、又はインターネットエクスプローラーを使って上記URLを開くことをお勧めします。
 
 If you use another web browsers, you will get downloading `.application` file. After downloading, please open the `.application` file manually. Then start installation and launching.  
-IE以外のブラウザをお使いの場合は、`.application` ファイルのダウンロードが始まります。ダウンロードが終わったら、手動で `.application` ファイルを開いてください。するとインストールと実行が始まります。
+Edge、又 は IE 以外のブラウザをお使いの場合は、`.application` ファイルのダウンロードが始まります。  
+ダウンロードが終わったら、手動で `.application` ファイルを開いてください。  
+するとインストールと実行が始まります。
 
 You will encounter security warning uring installation. Please open the [More info] link and click [Run Anyway] button.  
 インストール中、セキュリティ警告が表示されます。[詳細] リンクを開き、[実行] ボタンをクリックしてください。
