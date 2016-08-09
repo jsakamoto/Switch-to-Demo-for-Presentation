@@ -4,9 +4,13 @@
 
 This application allows you to hide or show the slideshow window of PowerPoint when you type Win-key + Shift + H, and it stays on task tray.
 
+And if you use presenter view with multi-monitor, the app also toggle extend/dupulicate display mode automatically sync with show/hide slideshow.
+
 It's convenient to switch presentation to demo.
 
 Win キー + Shift + H を押すと、PowerPoint のスライドショー画面の非表示/表示を切り替える、タスクトレイに常駐するアプリケーションです。
+
+さらに、マルチモニタ環境で発表者ビューを使用している場合は、スライドショー画面の表示/非表示と同時に、ディスプレイの拡張/複製モードも自動で切り替えます。
 
 プレゼンの途中でデモに切り替えたいときに便利です。
 
