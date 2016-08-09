@@ -50,6 +50,7 @@ static void OnInitDialog(HWND hDlg)
 	SendDlgItemMessage(hDlg, IDC_MODSHIFT, BM_SETCHECK, mod & MOD_SHIFT ? 1 : 0, 0);
 	SendDlgItemMessage(hDlg, IDC_MODCTRL, BM_SETCHECK, mod & MOD_CONTROL ? 1 : 0, 0);
 	SendDlgItemMessage(hDlg, IDC_MODALT, BM_SETCHECK, mod & MOD_ALT ? 1 : 0, 0);
+	SendDlgItemMessage(hDlg, IDC_CHECK1, BM_SETCHECK, g_Config.AutoChangeMultiMonitorMode ? 1 : 0, 0);
 
 	LPCVKEYWITHNAME pVKeys = NULL;
 	int nKeys = 0;
@@ -87,6 +88,8 @@ static void OnOK(HWND hDlg)
 	lstrcat(g_Config.szHotkeyDisplayName, mod & MOD_CONTROL ? TEXT("Ctrl + ") : TEXT(""));
 	lstrcat(g_Config.szHotkeyDisplayName, mod & MOD_ALT ? TEXT("Alt + ") : TEXT(""));
 	lstrcat(g_Config.szHotkeyDisplayName, szKey);
+
+	g_Config.AutoChangeMultiMonitorMode = SendDlgItemMessage(hDlg, IDC_CHECK1, BM_GETCHECK, 0, 0) != 0;
 }
 
 static void GetVKeys(LPCVKEYWITHNAME *ppVKeys, int *pnCount)
