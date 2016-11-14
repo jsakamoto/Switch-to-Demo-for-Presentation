@@ -1,4 +1,6 @@
-# ![favicon](contents/SlideShow_256.png) Switch to Demo for Presentation
+# Switch to Demo for Presentation
+
+![Summary](contents/summary.png) 
 
 ## Summary / 概要
 
