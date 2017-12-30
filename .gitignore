@@ -3,6 +3,7 @@
 *.sdf
 *.opensdf
 *.aps
+.vs/
 bin/
 obj/
 Release/
